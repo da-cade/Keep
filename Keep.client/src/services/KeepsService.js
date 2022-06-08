@@ -13,6 +13,7 @@ class KeepsService {
   async createKeep(keepData) {
     const res = await api.post('api/keeps', keepData)
     AppState.keeps.unshift(res.data)
+    AppState.profileKeeps.unshift(res.data)
   }
   async editKeep(update) {
     const res = await api.put(`api/keeps/${update.id}`, update)

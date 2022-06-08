@@ -4,6 +4,7 @@ import { api } from "./AxiosService";
 class VaultKeepsService {
   async getKeepsByVault(id) {
     const res = await api.get(`api/vaults/${id}/keeps`)
+    console.log(res.data)
     AppState.keeps = res.data
   }
 

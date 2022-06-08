@@ -32,7 +32,7 @@
           title="Go to Account Page"
         >
           <div class="list-group-item list-group-item-action hoverable">
-            Manage Account
+            My Profile
           </div>
         </router-link>
         <div

@@ -9,6 +9,7 @@
           type="text"
           placeholder="Name..."
           required
+          maxlength="30"
         />
       </div>
       <div class="d-flex justify-content-between my-2">
@@ -19,6 +20,7 @@
           type="text"
           placeholder="Add an Image..."
           required
+          maxlength="400"
         />
       </div>
       <div class="d-flex justify-content-between my-2">
@@ -29,6 +31,7 @@
           placeholder="Description..."
           type="text"
           required
+          maxlength="500"
         />
       </div>
       <div class="d-flex justify-content-between my-2">

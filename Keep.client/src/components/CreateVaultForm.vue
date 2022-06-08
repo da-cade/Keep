@@ -8,6 +8,8 @@
           class="form-control"
           type="text"
           placeholder="Name..."
+          required
+          maxlength="30"
         />
       </div>
       <div class="d-flex justify-content-between my-2">
@@ -17,6 +19,8 @@
           class="form-control"
           placeholder="Description..."
           type="text"
+          required
+          maxlength="500"
         />
       </div>
       <div class="form-check my-2">

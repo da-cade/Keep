@@ -51,16 +51,17 @@
 </template>
 
 <script>
-import { watchEffect } from "@vue/runtime-core";
+import { ref, watchEffect } from "@vue/runtime-core";
 import Pop from "../utils/Pop";
 import { logger } from "../utils/Logger";
 import { keepsService } from "../services/KeepsService";
 import { useRoute } from "vue-router";
 export default {
   setup() {
+    const loaded = ref(false)
     const route = useRoute()
     watchEffect(async () => {
-      if (route.name != "VaultPage")
+      if (route.name == "Home" || route.name == "ProfilePage" || route.params.keepId)
         try {
           await keepsService.getAllKeeps()
         } catch (error) {

@@ -35,7 +35,7 @@
         :key="v.id"
         @click.stop="goToVaultPage(v)"
       >
-        <div class="vaultContent d-flex align-items-end m-2">
+        <div class="vaultContent selectable d-flex align-items-end m-2">
           <img
             v-if="v.coverImg"
             :src="v.coverImg"
@@ -140,7 +140,7 @@
 </template>
 
 <script>
-import { computed, onMounted, watchEffect } from "@vue/runtime-core"
+import { computed, onMounted, ref, watchEffect } from "@vue/runtime-core"
 import Pop from "../utils/Pop"
 import { profilesService } from "../services/ProfilesService"
 import { logger } from "../utils/Logger"
@@ -151,6 +151,7 @@ export default {
   setup() {
     const route = useRoute()
     const router = useRouter()
+    const loaded = ref(false)
     // watchEffect(() => {
     //   if (AppState.vaultkeeps.length) {
     //     AppState.vaultkeeps.forEach(vk => {
@@ -165,24 +166,23 @@ export default {
     //     })
     //   }
     // })
-    onMounted(async () => {
-      watchEffect(async () => {
-        try {
-          if (route.name == 'ProfilePage') {
-            await profilesService.getKeepsByProfile(route.params.id)
-            await profilesService.getProfile(route.params.id)
-            if (route.params.id != AppState.account.id) {
-              await profilesService.getVaultsByProfile(route.params.id)
-            } else {
-              await accountService.getMyVaults()
-            }
-            await profilesService.getVaultkeepsByProfile(route.params.id)
+    watchEffect(async () => {
+      try {
+        if (route.name == 'ProfilePage') {
+          await profilesService.getKeepsByProfile(route.params.id)
+          await profilesService.getProfile(route.params.id)
+          if (route.params.id != AppState.account.id) {
+            await profilesService.getVaultsByProfile(route.params.id)
+          } else {
+            await accountService.getMyVaults()
           }
-        } catch (error) {
-          logger.error(error)
-          Pop.toast(error.message, 'error')
+          await profilesService.getVaultkeepsByProfile(route.params.id)
         }
-      })
+      } catch (error) {
+        logger.error(error)
+        Pop.toast(error.message, 'error')
+      }
+      loaded.value = true
     })
     return {
       route,

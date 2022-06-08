@@ -4,7 +4,7 @@
       :src="keep.img"
       class="img-fluid keepImg selectable"
       @click="goToDetails"
-      alt=""
+      :alt="keep.name"
     />
     <div class="keepInfo d-flex w-100 justify-content-between align-items-end">
       <h5 id="cow" class="text-light ps-1" @click="goToDetails">
@@ -14,7 +14,7 @@
         :src="keep.creator?.picture"
         class="userImg rounded-circle"
         @click.stop="goToProfile"
-        alt=""
+        alt="user image"
       />
     </div>
   </div>
@@ -54,8 +54,7 @@ export default {
     const route = useRoute()
     const router = useRouter()
     const showModal = ref(false)
-    // const request = ref(false)
-    watchEffect(async () => {
+    watchEffect(() => {
       if (route.params.keepId == props.keep.id) {
         showModal.value = true
       }
@@ -70,7 +69,6 @@ export default {
       async goToDetails() {
         try {
           router.push({ name: (route.name == "Home" ? 'KeepDetails' : route.name == "ProfilePage" ? "ProfileKeepDetails" : "VaultKeepDetails"), params: { keepId: props.keep.id } })
-          await keepsService.getKeep(props.keep.id)
         } catch (error) {
           logger.error(error)
           Pop.toast(error.message, 'error')
@@ -85,7 +83,7 @@ export default {
 <style lang="scss" scoped>
 .modalFade-enter-active,
 .modalFade-leave-active {
-  transition: opacity 0.25s ease;
+  transition: opacity 0.25s ease-in-out;
 }
 
 .modalFade-enter-from,

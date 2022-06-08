@@ -10,6 +10,7 @@
               v-if="authenticated"
               class="btn btn-danger"
               @click.stop="deleteVault(vault.id)"
+              title="Delete this Vault"
             >
               Delete Vault
             </button>
@@ -41,19 +42,12 @@ export default {
     const route = useRoute()
     const router = useRouter()
     const showModal = ref()
-    // watchEffect(() => {
-    //   if (AppState.activeVault.isPrivate && (AppState.account.id != AppState.activeVault.creatorId)) {
-    //     router.push({ name: 'Home' })
-    //   }
-    // })
     onMounted(async () => {
       try {
         await vaultsService.getVault(route.params.id)
         await vaultKeepsService.getKeepsByVault(route.params.id)
       } catch (error) {
-        // if (AppState.activeVault.isPrivate && (AppState.account.id != AppState.activeVault.creatorId)) {
         router.push({ name: 'Home' })
-        // }
         logger.error(error)
         Pop.toast(error.message, 'error')
       }
@@ -64,7 +58,7 @@ export default {
       vault: computed(() => AppState.activeVault),
       keepCount: computed(() => AppState.keeps.length),
       authenticated: computed(() => {
-        return AppState.account.id == route.params.id
+        return AppState.account.id == AppState.activeVault.creatorId
       }),
       async deleteVault(id) {
         try {

@@ -81,12 +81,14 @@
           <i
             v-if="route.name != 'VaultKeepDetails' && authenticated"
             class="mdi mdi-delete selectable rounded mt-auto"
+            title="Delete this Keep"
             @click.stop="deleteKeep()"
           ></i>
           <button
             v-if="route.name == 'VaultKeepDetails'"
             class="btn selectable shadow"
-            @click.stop="removeFromVault(keep.vaultKeepId)"
+            @click.stop="removeFromVault()"
+            title="Remove Keep from this Vault"
           >
             Remove from Vault
           </button>
@@ -145,7 +147,7 @@
 
 
 <script>
-import { computed, ref, watchEffect } from "@vue/runtime-core"
+import { computed, onMounted, ref, watchEffect } from "@vue/runtime-core"
 import { useRoute, useRouter } from "vue-router"
 import { AppState } from "../AppState"
 import Pop from "../utils/Pop"
@@ -183,9 +185,11 @@ export default {
           selected.value = {}
         } else {
           addToVault(selected.value)
-
         }
       }
+    })
+    onMounted(async () => {
+      await keepsService.getKeep(props.keep.id)
     })
     return {
       selected,
@@ -205,10 +209,12 @@ export default {
           Pop.toast(error.message, 'error')
         }
       },
-      async removeFromVault(id) {
+      async removeFromVault() {
         try {
-          await vaultKeepsService.delete(id)
+          debugger
+          await vaultKeepsService.delete(props.keep.vaultKeepId)
           router.go(-1)
+          Pop.toast("Removed Keep from vault", "success", "top-end", 2000, false)
         } catch (error) {
           logger.error(error)
           Pop.toast(error.message, 'error')
@@ -232,7 +238,7 @@ i {
   .keepImg {
     object-fit: cover;
     height: 100%;
-    width: auto;
+    width: 100%;
   }
   .keepDetails {
     height: 80vh;
