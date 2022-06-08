@@ -1,11 +1,11 @@
 <template>
-  <div class="row">
-    <div class="col-md-6 pe-0 keepDetails">
-      <div class="h-100 p-3">
-        <img :src="keep.img" class="keepImg img-fluid rounded" alt="" />
+  <div class="row g-0 h-100">
+    <div class="col-sm-12 col-md-6 pe-0 keepDetails">
+      <div class="keepDetails p-3">
+        <img :src="keep.img" class="keepImg h-100 img-fluid rounded" alt="" />
       </div>
     </div>
-    <div class="col-md-6 ps-0 keepDetails">
+    <div class="col-sm-12 col-md-6 ps-0 keepDetails">
       <div
         class="
           keepDetails
@@ -16,12 +16,12 @@
           p-3
         "
       >
-        <div class="d-flex">
+        <div class="d-flex icons">
           <div>
-            <i class="mdi mdi-eye me-1"></i
+            <i class="mdi mdi-eye me-1" title="Views"></i
             ><span class="me-2">{{ keep.views }}</span>
           </div>
-          <div>
+          <div title="Keeps">
             <svg
               class="me-1"
               width="20"
@@ -52,7 +52,7 @@
             <span class="me-2">{{ keep.kept }}</span>
           </div>
           <div>
-            <i class="mdi mdi-share-variant me-1"></i>
+            <i class="mdi mdi-share-variant me-1" title="Shares"></i>
             <span class="">{{ keep.shares }} </span>
           </div>
         </div>
@@ -61,11 +61,12 @@
           <h5>{{ keep.description }}</h5>
           <hr class="w-75" />
         </div>
-        <div
-          class="d-flex w-100 buttonRow justify-content-between"
-          v-show="account.id"
-        >
-          <select v-model="selected">
+        <div class="buttonRow" v-if="account.id">
+          <select
+            v-model="selected"
+            class="rounded"
+            v-if="route.name != 'VaultKeepDetails'"
+          >
             <option disabled value="">Add to Vault</option>
             <!-- REVIEW <option
               data-bs-toggle="modal"
@@ -78,12 +79,56 @@
             </option>
           </select>
           <i
+            v-if="route.name != 'VaultKeepDetails' && authenticated"
             class="mdi mdi-delete selectable rounded mt-auto"
-            v-if="authenticated"
             @click.stop="deleteKeep()"
           ></i>
-          <Login class="slim" />
+          <button
+            v-if="route.name == 'VaultKeepDetails'"
+            class="btn selectable shadow"
+            @click.stop="removeFromVault(keep.vaultKeepId)"
+          >
+            Remove from Vault
+          </button>
+          <div class="p-0 rounded slim" v-if="keep.creatorId != account?.id">
+            <router-link
+              :to="{ name: 'ProfilePage', params: { id: keep.creatorId } }"
+            >
+              <div class="d-flex slim" v-if="keep.creator?.picture">
+                <img
+                  :src="keep.creator?.picture"
+                  alt="account photo"
+                  class="accountImg"
+                />
+                <span
+                  v-if="route.name != 'VaultKeepDetails'"
+                  class="p-2 mt-1 text-light lighten-30"
+                  >{{ keep.creator?.name }}</span
+                >
+                <span v-else class="p-2 text-dark">{{
+                  keep.creator?.name
+                }}</span>
+              </div>
+            </router-link>
+          </div>
+          <div class="p-0 rounded" v-else>
+            <router-link
+              :to="{ name: 'ProfilePage', params: { id: keep.creatorId } }"
+            >
+              <div class="d-flex slim" v-if="keep.creator?.picture">
+                <img
+                  :src="keep.creator?.picture"
+                  alt="account photo"
+                  class="accountImg"
+                />
+                <span class="p-2 text-light lighten-30 mt-1">{{
+                  keep.creator?.name
+                }}</span>
+              </div>
+            </router-link>
+          </div>
         </div>
+        <div v-else></div>
       </div>
     </div>
   </div>
@@ -101,13 +146,11 @@
 
 <script>
 import { computed, ref, watchEffect } from "@vue/runtime-core"
-import { useRoute } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 import { AppState } from "../AppState"
 import Pop from "../utils/Pop"
 import { logger } from "../utils/Logger"
 import { vaultKeepsService } from "../services/VaultKeepsService"
-import { vaultsService } from "../services/VaultsService"
-import { Modal } from "bootstrap"
 import { keepsService } from "../services/KeepsService"
 export default {
   props: {
@@ -118,8 +161,8 @@ export default {
   },
   setup(props) {
     const route = useRoute()
+    const router = useRouter()
     const selected = ref()
-
     async function addToVault(vaultId) {
       try {
         let vkData = {}
@@ -127,6 +170,7 @@ export default {
         vkData.vaultId = vaultId
         vkData.keepId = props.keep.id
         await vaultKeepsService.create(vkData)
+        Pop.toast(`Added`, 'success', 'top-end', 2000, false)
       } catch (error) {
         logger.error(error)
         Pop.toast(error.message, 'error')
@@ -139,17 +183,32 @@ export default {
           selected.value = {}
         } else {
           addToVault(selected.value)
+
         }
       }
     })
     return {
       selected,
+      route,
+      router,
       account: computed(() => AppState.account),
       authenticated: computed(() => AppState.account.id == props.keep.creatorId),
       myVaults: computed(() => AppState.myVaults),
       async deleteKeep() {
         try {
-          await keepsService.deleteKeep(props.keep.id)
+          if (await Pop.confirm()) {
+            await keepsService.deleteKeep(props.keep.id)
+            router.go(-1)
+          }
+        } catch (error) {
+          logger.error(error)
+          Pop.toast(error.message, 'error')
+        }
+      },
+      async removeFromVault(id) {
+        try {
+          await vaultKeepsService.delete(id)
+          router.go(-1)
         } catch (error) {
           logger.error(error)
           Pop.toast(error.message, 'error')
@@ -166,27 +225,77 @@ export default {
 i {
   color: $keepr-green;
 }
-.col {
-  max-height: 100%;
+@media screen and (min-width: 568px) {
+  .col {
+    max-height: 100%;
+  }
+  .keepImg {
+    object-fit: cover;
+    height: 100%;
+    width: auto;
+  }
+  .keepDetails {
+    height: 80vh;
+  }
+  .buttonRow {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    height: 3rem;
+    i {
+      font-size: 28pt;
+    }
+  }
 }
+@media screen and (max-width: 568px) {
+  .col {
+    max-height: 100%;
+  }
+  .keepImg {
+    object-fit: cover;
+    height: 100% !important;
+  }
+  .keepDetails {
+    height: 40vh;
+  }
+  .buttonRow {
+    display: flex;
+    flex-direction: column;
+    i {
+      font-size: 16pt;
+      order: 3;
+      align-self: flex-end;
+      margin-bottom: 0 !important;
+    }
+  }
+  .buttonRow > * {
+    margin-bottom: 0.5rem;
+  }
+}
+
 .keepContent {
   height: 80vh;
 }
-.keepDetails {
-  height: 80vh;
-}
-.keepImg {
-  object-fit: cover;
-  height: 100%;
-  width: auto;
-}
-.buttonRow {
-  height: 3rem;
-  i {
-    font-size: 28pt;
-  }
-}
 .slim {
   height: 3rem;
+  background-color: darken(#8392ab, 20%);
+  border-radius: 4px;
+}
+.dropdown-menu {
+  user-select: none;
+  display: block;
+  transform: scale(0);
+  transition: all 0.15s linear;
+}
+.dropdown-menu.show {
+  transform: scale(1);
+}
+.dropdown {
+  height: inherit !important;
+}
+.accountImg {
+  height: 100%;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
 }
 </style>

@@ -23,7 +23,7 @@ namespace Keep.Services
       return vaultkeep;
     }
 
-    internal void Create(VaultKeep vaultkeepData)
+    internal VaultKeep Create(VaultKeep vaultkeepData)
     {
       Vault vault = _vs.Get(vaultkeepData.VaultId);
       if (vault == null)
@@ -38,8 +38,8 @@ namespace Keep.Services
       keep.Kept++;
       _repo.HandleKept(keep);
 
-      _repo.Create(vaultkeepData);
-      // return newVaultKeep;
+      return _repo.Create(vaultkeepData);
+
     }
 
     internal void Delete(int id, string userId)

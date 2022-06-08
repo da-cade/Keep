@@ -77,5 +77,20 @@ namespace Keep.Controllers
         return BadRequest(e.Message);
       }
     }
+
+    [HttpGet("{id}/vaultkeeps")]
+    public async Task<ActionResult<List<VaultKeep>>> GetVaultKeepsByProfile(string id)
+    {
+      try
+      {
+        Account userInfo = await HttpContext.GetUserInfoAsync<Account>();
+        List<VaultKeep> vaultKeeps = _ps.GetVaultKeepsByProfile(id, userInfo?.Id);
+        return Ok(vaultKeeps);
+      }
+      catch (Exception e)
+      {
+        return BadRequest(e.Message);
+      }
+    }
   }
 }

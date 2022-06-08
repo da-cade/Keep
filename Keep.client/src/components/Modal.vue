@@ -1,7 +1,6 @@
 <template>
-  <div class="myModal d-flex justify-content-center">
-    <!--TODO @click.stop="closeModal()" not .stopping()-->
-    <div class="modalContainer bg-light rounded">
+  <div class="modalDialog d-flex justify-content-center" ref="dialog">
+    <div class="modalContent bg-light rounded">
       <slot name="modal-content-slot"></slot>
     </div>
   </div>
@@ -9,35 +8,56 @@
 
 
 <script>
+import { onMounted, ref, watchEffect } from "@vue/runtime-core"
 import { useRouter } from "vue-router"
 export default {
   setup() {
     const router = useRouter()
+    const dialog = ref()
+    watchEffect(() => {
+      dialog.value
+    })
+    onMounted(() => {
+      dialog.value.addEventListener('click', e => {
+        if (e.target === e.currentTarget) {
+          router.go(-1)
+        }
+      })
+    })
     return {
       router,
-      closeModal() {
-        router.go(-1)
-      }
+      dialog,
     }
   }
 }
+
 </script>
 
 
 <style lang="scss" scoped>
-.myModal {
+.modalDialog {
   position: fixed;
   top: 0;
   right: 0;
   background-color: rgba(0, 0, 0, 0.438);
   height: 100vh;
   width: 100vw;
+  z-index: 11;
+}
+.modalField {
+  position: relative;
+  display: none;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 100vw;
   z-index: 10;
 }
-.modalContainer {
-  position: relative;
+.modalContent {
+  position: fixed;
   top: 10vh;
   width: 80vw;
   height: 80vh;
+  z-index: 20;
 }
 </style>

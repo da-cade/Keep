@@ -1,9 +1,10 @@
 <template>
-  <div class="p-0 rounded bg-secondary">
+  <div id="login-bar" class="p-0 rounded">
     <button
       class="btn selectable text-success lighten-30 text-uppercase my-lg-0"
       @click="login"
       v-if="!user.isAuthenticated"
+      title="Log in"
     >
       Login
     </button>
@@ -15,13 +16,10 @@
         data-bs-toggle="dropdown"
         aria-expanded="false"
         id="authDropdown"
+        title="Open account menu"
       >
         <div style="height: inherit" v-if="account.picture">
-          <img
-            :src="account.picture"
-            alt="account photo"
-            class="rounded accountImg"
-          />
+          <img :src="account.picture" alt="account photo" class="accountImg" />
           <span class="mx-3 text-light lighten-30">{{ account.name }}</span>
         </div>
       </div>
@@ -29,7 +27,10 @@
         class="dropdown-menu p-0 list-group w-100"
         aria-labelledby="authDropdown"
       >
-        <router-link :to="{ name: 'ProfilePage', params: { id: account.id } }">
+        <router-link
+          :to="{ name: 'ProfilePage', params: { id: account.id } }"
+          title="Go to Account Page"
+        >
           <div class="list-group-item list-group-item-action hoverable">
             Manage Account
           </div>
@@ -37,6 +38,7 @@
         <div
           class="list-group-item list-group-item-action hoverable text-danger"
           @click="logout"
+          title="Log"
         >
           <i class="mdi mdi-logout"></i>
           logout
@@ -86,5 +88,10 @@ export default {
 }
 .accountImg {
   height: 100%;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+#login-bar {
+  background-color: darken(#8392ab, 20%);
 }
 </style>

@@ -32,29 +32,75 @@ namespace Keep.Repositories
     internal List<KeepPost> GetPublicProfileKeeps(string userId)
     {
       string sql = @"
-      SELECT * 
-      FROM keeps WHERE creatorId = @userId;
+      SELECT 
+      a.*,
+      k.* 
+      FROM keeps k
+      JOIN accounts a ON k.creatorId = a.id
+      WHERE creatorId = @userId;
       ";
-      return _db.Query<KeepPost>(sql, new { userId }).ToList();
+      return _db.Query<Account, KeepPost, KeepPost>(sql, (a, k) =>
+      {
+        k.Creator = a;
+        return k;
+      }, new { userId }).ToList();
     }
     internal List<KeepPost> GetAllProfileKeeps(string userId)
     {
-      string sql = "SELECT * FROM keeps WHERE creatorId = @userId";
-      return _db.Query<KeepPost>(sql, new { userId }).ToList();
+      string sql = @"SELECT
+      a.*,
+      k.*
+      FROM keeps k
+      JOIN accounts a ON k.creatorId = k.id
+      WHERE creatorId = @userId";
+      return _db.Query<Account, KeepPost, KeepPost>(sql, (a, k) =>
+      {
+        k.Creator = a;
+        return k;
+      }, new { userId }).ToList();
+    }
+
+    internal List<VaultKeep> GetVaultKeepsByProfile(string accountId)
+    {
+      string sql = @"SELECT
+      v.*,
+      vk.*
+      FROM vaultkeeps vk
+      JOIN vaults v ON vk.vaultId = v.id
+      WHERE v.isPrivate = false AND vk.creatorId = @accountId";
+      return _db.Query<VaultKeep>(sql, new { accountId }).ToList();
     }
 
     internal List<Vault> GetPublicProfileVaults(string userId)
     {
       string sql = @"
-      SELECT * FROM vaults WHERE creatorId = @userId AND isPrivate = false;
+      SELECT
+      a.*,
+      v.*
+      FROM vaults v
+      JOIN accounts a ON v.creatorId = a.id
+      WHERE creatorId = @userId AND isPrivate = false;
       ";
-      return _db.Query<Vault>(sql, new { userId }).ToList();
+      return _db.Query<Account, Vault, Vault>(sql, (a, v) =>
+      {
+        v.Creator = a;
+        return v;
+      }, new { userId }).ToList();
     }
 
     internal List<Vault> GetMyVaults(string userId)
     {
-      string sql = "SELECT * FROM vaults WHERE creatorId = @userId";
-      return _db.Query<Vault>(sql, new { userId }).ToList();
+      string sql = @"SELECT
+      a.*,
+      v.*
+      FROM vaults v
+      JOIN accounts a ON v.creatorId = a.id
+      WHERE creatorId = @userId";
+      return _db.Query<Account, Vault, Vault>(sql, (a, v) =>
+      {
+        v.Creator = a;
+        return v;
+      }, new { userId }).ToList();
     }
   }
 }

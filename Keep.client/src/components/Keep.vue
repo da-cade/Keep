@@ -7,7 +7,7 @@
       alt=""
     />
     <div class="keepInfo d-flex w-100 justify-content-between align-items-end">
-      <h5 class="text-light ps-1" @click="goToDetails">
+      <h5 id="cow" class="text-light ps-1" @click="goToDetails">
         {{ keep.name }}
       </h5>
       <img
@@ -23,7 +23,7 @@
     <keep-alive>
       <Modal
         v-if="showModal"
-        :id="'keepdetails-' + keep.id"
+        :id="'keepDetails-' + keep.id"
         :showModal="showModal"
       >
         <template #modal-content-slot>
@@ -36,7 +36,7 @@
 
 
 <script>
-import { ref, watchEffect } from "@vue/runtime-core"
+import { onMounted, ref, watchEffect } from "@vue/runtime-core"
 import { keepsService } from "../services/KeepsService"
 import { useRoute, useRouter } from "vue-router"
 import { AppState } from "../AppState"
@@ -54,26 +54,28 @@ export default {
     const route = useRoute()
     const router = useRouter()
     const showModal = ref(false)
+    // const request = ref(false)
     watchEffect(async () => {
       if (route.params.keepId == props.keep.id) {
         showModal.value = true
-        try {
-          await keepsService.getKeep(route.params.keepId)
-        } catch (error) {
-          logger.error(error)
-          Pop.toast(error.message, 'error')
-        }
       }
-      if (route.name == 'Home') {
+      if (route.params.keepId != props.keep.id) {
         showModal.value = false
         AppState.activeKeep = {};
       }
     })
     return {
+      route,
       showModal,
-      goToDetails() {
-        router.push({ name: 'KeepDetails', params: { keepId: props.keep.id } })
-      }
+      async goToDetails() {
+        try {
+          router.push({ name: (route.name == "Home" ? 'KeepDetails' : route.name == "ProfilePage" ? "ProfileKeepDetails" : "VaultKeepDetails"), params: { keepId: props.keep.id } })
+          await keepsService.getKeep(props.keep.id)
+        } catch (error) {
+          logger.error(error)
+          Pop.toast(error.message, 'error')
+        }
+      },
     }
   }
 }
@@ -92,12 +94,15 @@ export default {
 }
 
 .keepContent {
+  -webkit-column-break-inside: avoid;
   position: relative;
   width: 150px;
   margin: 0 1rem 1rem 0;
   display: inline-block;
   width: 100%;
   border-radius: 4px;
+  // box-shadow: 1.4px 2px 2.7px rgba(0, 0, 0, 0.075),
+  //   11px 16px 19px rgba(0, 0, 0, 0.15);
 }
 
 .keepImg {
@@ -110,12 +115,16 @@ export default {
   left: 0;
   padding: 0.25rem;
   z-index: 2;
+  background-color: rgba(0 0 0 / 23%);
+  box-shadow: 0px -9.2px 9.1px 0px rgba(0 0 0 / 17%),
+    0px -22px 21.8px 0px rgba(0 0 0 / 8%);
+
   h5:hover {
     cursor: pointer;
   }
 }
 
 .userImg {
-  height: 3rem;
+  height: 2.5rem;
 }
 </style>

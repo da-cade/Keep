@@ -1,5 +1,5 @@
 <template>
-  <div class="masonryContainer">
+  <div class="masonryContainer mt-3">
     <Keep v-for="k in keeps" :key="k.id" :keep="k" />
   </div>
 </template>
@@ -35,11 +35,5 @@ export default {
     columns: 2;
     column-gap: 1rem;
   }
-  // div {
-  //   width: 150px;
-  //   margin: 0 1rem 1rem 0;
-  //   display: inline-block;
-  //   width: 100%;
-  // }
 }
 </style>

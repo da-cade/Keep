@@ -18,7 +18,7 @@ namespace Keep.Repositories
       return _db.QueryFirstOrDefault<VaultKeep>(sql, new { id });
     }
 
-    internal void Create(VaultKeep vaultkeepData)
+    internal VaultKeep Create(VaultKeep vaultkeepData)
     {
       string sql = @"
       INSERT INTO vaultkeeps
@@ -28,7 +28,7 @@ namespace Keep.Repositories
       SELECT LAST_INSERT_ID();
       ";
       vaultkeepData.Id = _db.ExecuteScalar<int>(sql, vaultkeepData);
-      // return vaultkeepData;
+      return vaultkeepData;
     }
 
 

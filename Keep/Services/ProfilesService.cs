@@ -47,5 +47,12 @@ namespace Keep.Services
       List<Vault> vaults = _repo.GetMyVaults(userId);
       return vaults;
     }
+
+    internal List<VaultKeep> GetVaultKeepsByProfile(string accountId, string userId)
+    {
+      Profile found = Get(accountId);
+      List<VaultKeep> vaultkeeps = _repo.GetVaultKeepsByProfile(accountId);
+      return vaultkeeps;
+    }
   }
 }

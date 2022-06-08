@@ -1,6 +1,10 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark bg-kpr-green px-3">
-    <router-link class="navbar-brand d-flex" :to="{ name: 'Home' }">
+    <router-link
+      class="navbar-brand d-flex"
+      :to="{ name: 'Home' }"
+      title="Return to Home Page"
+    >
       <div class="d-flex flex-column align-items-center">
         <svg
           width="57"
@@ -35,21 +39,35 @@
       data-bs-target="#navbarText"
       aria-controls="navbarText"
       aria-expanded="false"
-      aria-label="Toggle navigation"
+      aria-label="Toggle navigation bar"
     >
       <span class="navbar-toggler-icon" />
     </button>
     <div class="collapse navbar-collapse" id="navbarText">
       <ul class="navbar-nav me-auto"></ul>
-      <!-- LOGIN COMPONENT HERE -->
       <Login class="slim" />
     </div>
   </nav>
 </template>
 
 <script>
+import { watchEffect } from "@vue/runtime-core";
+import Pop from "../utils/Pop";
+import { logger } from "../utils/Logger";
+import { keepsService } from "../services/KeepsService";
+import { useRoute } from "vue-router";
 export default {
   setup() {
+    const route = useRoute()
+    watchEffect(async () => {
+      if (route.name != "VaultPage")
+        try {
+          await keepsService.getAllKeeps()
+        } catch (error) {
+          logger.error(error)
+          Pop.toast(error.message, 'error')
+        }
+    })
     return {};
   },
 };

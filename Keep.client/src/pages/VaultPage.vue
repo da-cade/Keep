@@ -6,7 +6,11 @@
         <div class="m-4">
           <div class="d-flex justify-content-between">
             <h2>{{ vault.name }}</h2>
-            <button class="btn btn-danger" @click.stop="deleteVault(vault.id)">
+            <button
+              v-if="authenticated"
+              class="btn btn-danger"
+              @click.stop="deleteVault(vault.id)"
+            >
               Delete Vault
             </button>
           </div>
@@ -25,7 +29,7 @@
 
 
 <script>
-import { computed, watchEffect } from "@vue/runtime-core"
+import { computed, onMounted, ref, watch, watchEffect } from "@vue/runtime-core"
 import Pop from "../utils/Pop"
 import { logger } from "../utils/Logger"
 import { vaultKeepsService } from "../services/VaultKeepsService"
@@ -36,27 +40,37 @@ export default {
   setup() {
     const route = useRoute()
     const router = useRouter()
-    watchEffect(async () => {
+    const showModal = ref()
+    // watchEffect(() => {
+    //   if (AppState.activeVault.isPrivate && (AppState.account.id != AppState.activeVault.creatorId)) {
+    //     router.push({ name: 'Home' })
+    //   }
+    // })
+    onMounted(async () => {
       try {
-        if (AppState.account.id) {
-          await vaultsService.getVault(route.params.id)
-        }
-        if (AppState.activeVault.id)
-          await vaultKeepsService.getKeepsByVault(route.params.id)
+        await vaultsService.getVault(route.params.id)
+        await vaultKeepsService.getKeepsByVault(route.params.id)
       } catch (error) {
+        // if (AppState.activeVault.isPrivate && (AppState.account.id != AppState.activeVault.creatorId)) {
+        router.push({ name: 'Home' })
+        // }
         logger.error(error)
         Pop.toast(error.message, 'error')
       }
     })
     return {
+      showModal,
       keeps: computed(() => AppState.keeps),
       vault: computed(() => AppState.activeVault),
       keepCount: computed(() => AppState.keeps.length),
+      authenticated: computed(() => {
+        return AppState.account.id == route.params.id
+      }),
       async deleteVault(id) {
         try {
           if (await Pop.confirm()) {
             await vaultsService.deleteVault(id)
-            router.push({ name: 'Home' })
+            router.push({ name: 'ProfilePage', params: { id: AppState.account.id } })
           }
         } catch (error) {
           logger.error(error)

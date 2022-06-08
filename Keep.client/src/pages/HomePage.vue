@@ -18,14 +18,6 @@ import { keepsService } from "../services/KeepsService"
 export default {
   name: 'Home',
   setup() {
-    onMounted(async () => {
-      try {
-        await keepsService.getAllKeeps()
-      } catch (error) {
-        logger.error(error)
-        Pop.toast(error.message, 'error')
-      }
-    })
     return {
       keeps: computed(() => AppState.keeps)
     }

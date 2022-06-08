@@ -15,7 +15,6 @@ class AccountService {
   async getMyVaults() {
     try {
       const res = await api.get('/account/vaults')
-      console.log(res.data)
       AppState.myVaults = res.data
     } catch (error) {
       logger.error(error)
