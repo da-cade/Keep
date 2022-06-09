@@ -61,7 +61,7 @@ export default {
     const loaded = ref(false)
     const route = useRoute()
     watchEffect(async () => {
-      if (route.name == "Home" || route.name == "ProfilePage" || route.params.keepId)
+      if (route.name == "Home" || route.name == "ProfilePage")
         try {
           await keepsService.getAllKeeps()
         } catch (error) {

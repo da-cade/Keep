@@ -69,6 +69,7 @@ export default {
       async goToDetails() {
         try {
           router.push({ name: (route.name == "Home" ? 'KeepDetails' : route.name == "ProfilePage" ? "ProfileKeepDetails" : "VaultKeepDetails"), params: { keepId: props.keep.id } })
+          // await keepsService.getKeep(props.keep.id)
         } catch (error) {
           logger.error(error)
           Pop.toast(error.message, 'error')

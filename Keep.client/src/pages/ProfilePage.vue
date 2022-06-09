@@ -86,8 +86,17 @@
     </div>
     <br />
     <div class="row">
-      <div class="col-12">
-        <div class="d-flex align-items-center ms-4">
+      <div
+        class="
+          col-12
+          ms-0
+          flex-column
+          d-flex
+          align-items-center
+          justify-content-center
+        "
+      >
+        <div class="d-flex w-100 align-items-center align-self-start ms-4">
           <h2 class="me-2">Keeps</h2>
           <i
             v-if="authenticated"

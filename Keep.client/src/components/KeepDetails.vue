@@ -19,7 +19,7 @@
         <div class="d-flex icons">
           <div>
             <i class="mdi mdi-eye me-1" title="Views"></i
-            ><span class="me-2">{{ keep.views }}</span>
+            ><span class="me-2">{{ keep.views + 1 }}</span>
           </div>
           <div title="Keeps">
             <svg
@@ -85,7 +85,7 @@
             @click.stop="deleteKeep()"
           ></i>
           <button
-            v-if="route.name == 'VaultKeepDetails'"
+            v-if="route.name == 'VaultKeepDetails' && authenticated"
             class="btn selectable shadow"
             @click.stop="removeFromVault()"
             title="Remove Keep from this Vault"
@@ -96,7 +96,11 @@
             <router-link
               :to="{ name: 'ProfilePage', params: { id: keep.creatorId } }"
             >
-              <div class="d-flex slim" v-if="keep.creator?.picture">
+              <div
+                class="d-flex slim"
+                v-if="keep.creator?.picture"
+                :title="'Go to ' + keep.creator?.name + '\'s profile'"
+              >
                 <img
                   :src="keep.creator?.picture"
                   alt="account photo"

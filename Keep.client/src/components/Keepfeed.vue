@@ -1,7 +1,7 @@
 <template>
   <div class="masonryContainer mt-3">
     <Transition name="modalFade">
-      <div class="hover-over" v-if="!loaded">
+      <div class="hover-over rounded" v-if="!loaded">
         <svg
           style="margin-top: 30vh"
           version="1.1"
@@ -84,6 +84,7 @@ export default {
   },
   setup() {
     const loaded = ref(false)
+    // REVIEW waterfall
     onMounted(() => setTimeout(() => {
       loaded.value = true
     }, 1500))
@@ -107,7 +108,7 @@ export default {
 }
 .masonryContainer {
   position: relative;
-  width: 100%;
+  width: 94vw;
   min-height: 80vh;
   @media screen and (min-width: 1400px) {
     columns: 6;
@@ -126,12 +127,13 @@ export default {
     display: flex;
     justify-content: center;
     align-items: start;
-    background-color: rgba(93, 91, 91, 0.693);
+    background-color: rgba(150, 149, 149, 0.403);
     width: 100%;
     height: 100%;
     z-index: 4;
     top: 0;
-    left: 0;
+    left: 2;
+    right: 2;
   }
   @import url(https://fonts.googleapis.com/css?family=Comfortaa:400,700,300);
 
@@ -149,18 +151,6 @@ export default {
     margin: 20px;
     display: inline-block;
   }
-  // h1{
-  //   text-align: center;
-  //   color: $fontColor;
-  //   margin: 0 0 100px;
-  //   font-size: 34px;
-  //   font-weight: 100;
-  //   text-transform: uppercase;
-  //   background-color: darken($baseColor, 5);
-  //   padding: 20px 0;
-  //   b{
-  //     font-weight: 700;
-  //   }
 }
 
 //follow me template

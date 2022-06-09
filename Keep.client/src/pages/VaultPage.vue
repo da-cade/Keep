@@ -21,7 +21,7 @@
     </div>
     <br />
     <div class="row">
-      <div class="col-12">
+      <div class="col-12 ms-0 d-flex flex-column align-items-center">
         <Keepfeed :keeps="keeps" class="m-4" />
       </div>
     </div>
