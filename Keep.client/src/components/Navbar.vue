@@ -72,7 +72,7 @@ export default {
     return {};
   },
 };
-// jim
+
 </script>
 
 <style scoped>
